@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Music Video Production"
+  short_description: "Direct and finish a lyric-led AI music video"
+  default_prompt: "Use $ai-music-video-production to build a finished music video from my song, lyrics, and creative brief."
