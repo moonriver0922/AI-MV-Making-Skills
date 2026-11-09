@@ -1,31 +1,31 @@
-# Validation record · 2026-11-09
+# Validation record - 2026-11-09
 
-新增技能为`comfyui-mv-production`；原有`ai-music-video-production`及其配套文件保持在原路径。
+The added skill is `comfyui-mv-production`. The original `ai-music-video-production` files remain at their existing paths.
 
-## 已执行
+## Executed checks
 
-- Skill Creator的`quick_validate.py`检查通过：名称、frontmatter及入口文件结构有效。
-- 标准库unittest **9/9通过**：同Take最高完整候选、裁切祖先、父链循环/缺失、区间覆盖、JSON数值绑定、缺参数、缺节点、现代COMBO素材选项、音轨尾部丢失与完整解码。缺实现时测试先失败；现代COMBO校验也实际出现过错误放行，补充失败回归后修复通过。
-- 三个API模板均能用示例项目进行本地参数绑定；数值类型保持，已有准备文件不会覆盖。
-- 在已有ComfyUI上只读查询`/object_info`：三个图所需节点类均存在。示例图像、latent和视频文件未提供时，检查会拒绝素材就绪状态；没有POST、排队、取消或改变服务。
-- 独立使用测试将整个技能复制到临时`.agents/skills/`目录，再运行模板准备、来源审计和FFmpeg夹具验证。0.5秒/12帧画面配0.25秒音轨正确失败，完整0.5秒音轨版本通过，完整解码保持12帧，`visual_acceptance`仍为false。
-- 按独立反馈补充了`python3`/Windows解释器说明；SR缺素材校验已用现代COMBO选项失败用例验证并修复。二采的latent前提和Director界面upscale路径已写明。
+- Skill Creator `quick_validate.py` passed naming, frontmatter, and entry-point checks.
+- Standard-library unit tests: **9/9 passed**. Cases cover same-take highest full-frame selection, cropped ancestors, missing/cyclic parents, source interval coverage, typed binding, missing parameters/nodes, modern COMBO asset options, truncated audio, and full decode. Missing implementations initially failed; the modern COMBO check also reproduced an actual false-ready result before a regression fix passed.
+- All three API templates bind against the example project while preserving numeric types. Existing prepared files are protected against overwrite.
+- Read-only `/object_info` checks found all required node classes on the available ComfyUI server. Missing example images, latents, and video prevent asset readiness. No POST, queuing, cancellation, model download, or service change was performed for package validation.
+- An independent forward dry run copied the complete skill to a temporary `.agents/skills/` directory, prepared templates, audited sources, and tested FFmpeg fixtures. A 0.5-second/12-frame picture with a 0.25-second audio stream correctly failed; the complete 0.5-second counterpart passed and decoded all 12 frames. `visual_acceptance` remained false.
+- Feedback led to Python 3 interpreter guidance, the modern COMBO missing-video fix, and clearer latent prerequisites/Director upscale instructions.
 
-简单的无技能基线判断场景本来就通过，没有虚构“基线失败、技能治愈”的行为结论。独立测试证明的是说明可使用、工具可运行、故障能被识别，不证明技能对所有模型或项目都能提高画质。
+The simple no-skill baseline judgment scenario already passed. No fabricated baseline failure or claim of guaranteed behavioral improvement is made. Dry-run success establishes usability and checked failure handling, not universal video quality.
 
-## 未声称完成
+## Limits
 
-- 没有为验证这个发布包新增GPU生成或二采；模板是脱敏、参数化的API参考，结构来源于曾完成的本地工作流，参数化副本没有重新GPU验收。
-- 技能不含模型权重、参考人物、音乐、歌词、视频或用户机器路径。真实素材、节点版本和模型兼容性须在目标项目里确认。
-- `minimax-h3-refine.api.json`是已有目标尺寸兼容video latent与对应audio latent之后的采样尾段，不自动制作放大latent。可使用所安装版本的Director/Continuum原生upscale流程准备，不能直接把一采latent改名冒充目标尺寸。
-- 核源脚本的父链/批准状态是项目声明，`--probe`不证明声明真实或无烘焙修补；必须对照真实ComfyUI收据和画面。
-- 技术媒体检查不证明原曲内容一致、歌词已逐字听校、脚底接触精确、人物无漂移或完成真人连续视听验收。
-- 临时目录复制已验证；客户端重新启动后的自动发现、其他机器安装、GPU性能和9点交付能力不由本技能包测试证明。
+- No new GPU generation/refinement was run to validate this publication. API graphs are de-identified, parameterized references derived from completed local workflows; the parameterized copies have not received new GPU acceptance.
+- Models, references, music, lyrics, portraits, footage, and private machine paths are excluded. Real source files, node versions, and model compatibility must be established in the target environment.
+- `minimax-h3-refine.api.json` is a sampling tail after compatible target-size video and matching audio latents exist. It does not enlarge a latent automatically. Use a compatible upstream Director/Continuum preparation route; renaming a first-pass latent is not preparation.
+- Source approvals and ancestry are declarations. `--probe` cannot prove truthful lineage or absence of baked compositing; compare real workflow receipts and pictures.
+- Media checks do not prove original-song content, listening-based lyric alignment, exact foot contact, stable identities, or completed human audiovisual screening.
+- Temporary directory copying was tested. New-session discovery, other-machine installation, GPU performance, and any actual 09:00 film deadline remain outside this package's acceptance.
 
-## 复验
+## Reproduce
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-需要Python 3.10+及FFmpeg/ffprobe。没有媒体工具时，媒体用例会显示skip，不能把skip计为已验收。技能结构验证可另用Codex自带Skill Creator工具；它不是运行这些检查脚本的依赖。
+Python 3.10+ and FFmpeg/ffprobe are needed for all checks. Without FFmpeg, media tests are skipped; a skip is not a pass. Skill Creator's separate validator is optional for consumers and is not required to run the bundled helpers.

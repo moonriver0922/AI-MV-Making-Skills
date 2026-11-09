@@ -1,48 +1,48 @@
-# 字幕、封面与完整交付
+# Subtitles, cover, and complete delivery
 
-## 项目参数
+## Project specification
 
-fps、画幅、尺寸和总帧数来自用户规格，不把本项目示例变成所有作品的硬限制。例如24fps、5112帧对应213秒；额外3秒封面为72帧，含片头版为216秒/5184帧。保留无片头版本，避免封面挤掉剧情或歌曲。
+Take fps, aspect ratio, dimensions, and total frames from the user's requirements. Example: 5112 frames at 24fps is 213 seconds. A separate three-second cover adds 72 frames, producing 216 seconds/5184 frames. Keep the no-intro version; do not sacrifice story or music for a cover.
 
-原片、ComfyUI最高批准输出、工作剪辑、编码母版各自留存。统一色彩矩阵/像素比例时核对源标签，不凭宽高猜测所有来源都是同一色彩空间。整帧缩放或加边保持原构图，不静默裁切。
+Separate original footage, highest approved ComfyUI outputs, working edits, and delivery encodes. Check source color tags before normalization rather than assigning one matrix to every file. Scale or pad whole frames without silently changing composition.
 
-## 歌词和年份
+## Lyrics and dates
 
-字幕以权威歌词为文本，声学对齐为时钟。使用机器时间时标明未听校范围。粤语/其他原文与英文按意思对应，英文不强行逐词直译。重复歌词的译法在含义相同时保持一致。
+Use authoritative lyric text and acoustic timing. Label machine-derived or unlistened boundaries. Translate by meaning and reading time; keep repeated meanings consistent.
 
-用户要求两排左下时可用ASS：上排原文、下排英文，检查长行不换第三排；位置及字号基于实际观看尺寸。`\kf`配合黄色PrimaryColour与白色SecondaryColour形成逐步扫色，在唱词前有预显示时保留白色。英文按整句同一时段扫色，不声称英文逐词演唱同步。
+When two lower-left rows are requested, put the original language above English and check that long lines do not wrap into a third row. Choose size/position at actual viewing scale. ASS `\kf` with yellow PrimaryColour and white SecondaryColour provides progressive highlighting; preserve white during any pre-display interval. A translated line-wide wipe is not separately timed English singing.
 
-在**最终输出分辨率缩放之后**渲染字幕，避免把低清文字一起放大。抽查实际导出的白色开始、部分转黄、句末全黄以及每个年份提示。年份是否放左上、是否带底，由项目要求决定；无背景色并不排斥保证可读性的细描边。
+Render text after scaling picture to the final output dimensions. Inspect encoded white, partially highlighted, and completed lines plus every year cue. Date location/background follows the brief; an unboxed date may still need a thin outline for legibility.
 
-封面按用户提供的准确歌名、姓名和活动名核对。它是独立视觉资产，不能用封面生成成功证明影片人物一致。片头前缀需要同时偏移歌曲和字幕；若先给完整影片烧字幕，再接片头，字幕随视频自然后移。
+Verify the exact title, creator name, and event text on the cover. A successful cover does not prove film identity consistency. Adding an intro must move both music and burned subtitles correctly. Burning subtitles onto the complete film before prepending a cover naturally shifts them with the picture.
 
-## 避免音轨尾部被截断
+## Preserve the audio tail
 
-画面编码与音频封装分两步。`-frames:v`用于先生成silent picture，不要在最终音频mux里再次用帧上限、`-shortest`或不明确的`-t`截掉尾音。
+Encode silent picture, then mux complete audio separately. Use `-frames:v` on the picture stage, not on the final mux alongside the soundtrack. Avoid unintended `-shortest`, `-t`, or timestamp cutoffs.
 
 ```bash
-# 参数仅为示例，替换为项目值。画面先出silent.mp4。
+# Replace these example specifications with the actual project values.
 ffmpeg -i clean-picture.mkv -vf "scale=6192:2580:flags=lanczos,ass=lyrics.ass,setsar=1" \
   -an -frames:v 5112 -r 24 -c:v libx264 -crf 18 -pix_fmt yuv420p silent.mp4
 
-# PCM混音编码为AAC；如果输入本来就是兼容AAC且无需改动，可单独采用音频流复制。
+# Encode a PCM mix as AAC. A compatible unchanged AAC source can instead be copied.
 ffmpeg -i silent.mp4 -i expected-mix.wav -map 0:v:0 -map 1:a:0 \
   -c:v copy -c:a aac -b:a 192k -movflags +faststart final.mp4
 ```
 
-加3秒片头时，视频按完整3秒cover＋完整film构成；音频用3秒静音＋完整原混音。视频concat需先验证编码参数/时间基一致，不兼容来源先规范化。不要只看容器duration，音轨自身也必须到达预期尾部。
+For a three-second intro, concatenate complete cover picture and film, and build three seconds of silence followed by the complete expected mix. Check codec parameters/time bases before video stream concatenation; normalize incompatible sources first. Container duration alone does not prove the audio stream reaches the expected end.
 
-音乐与Foley有分轨时，调整某个动作区间只改变对应Foley时钟，保持音乐连续。换成车流画面后删除不再对应的旧脚步，是混音修改，不能再声称最终AAC与旧片逐字节相同。PCM同一性、AAC相关性、原速听校是不同证据。
+When music and Foley are separate, move only relevant Foley to match changed source intervals, leaving the music continuous. Removing obsolete footsteps under replacement traffic is a mix change; final AAC can no longer be claimed byte-identical to the previous mix. PCM identity, decoded AAC correlation, and listening are different evidence.
 
-## 验证与交付
+## Verify and provide usable files
 
 ```bash
 python3 scripts/verify_delivery.py final.mp4 --width 6192 --height 2580 \
   --fps 24 --frames 5112 --decode --output delivery-check.json
 ```
 
-工具检查实际视频/音频时长、尺寸、帧率、帧数与完整解码；不会比较歌曲内容、测量足底接触或授予视觉验收。还要对照原曲/预期混音，检查开始与尾音和声画同步；有条件时对解码音频做时移/相关与增益检查。
+The helper checks actual picture/audio durations, dimensions, fps, frame count, and full decode. It does not compare song content, measure foot contact, or grant visual approval. Compare against the expected full mix, inspect starts/tails and sync, and use decoded audio alignment/correlation/gain checks where appropriate.
 
-远程机器上的绝对路径不等于用户可播放链接。按用户已授权的方式提供观看版与母版；复用已有Tailscale或文件服务时检查文件存在、MIME、HTTP Range及完整下载SHA。客户端是否真正播放另记录，不能由服务端200/206代替。不要自动公开ComfyUI服务或上传媒体到第三方。
+A remote absolute path is not automatically playable for the user. Use the authorized delivery route. For an existing Tailscale/file service, check file existence, MIME, Range support, and a full-download hash. Client playback remains a separate check. Do not automatically expose ComfyUI publicly or upload media to another service.
 
-最终清单包括观看版、规定母版、封面、字幕/镜头表、工作流和来源记录、具体变更时间点、保留问题。所有质量声明对应实际证据：可以说“6K尺寸输出”，不能把1152来源经SR输出说成原生6K拍摄；尚未解决的脸型差异或纸方向须明确写出。
+Deliver review media, specified master, cover, subtitles/shot sheet, workflows/source records, timestamped changes, and unresolved issues. Report “6K-dimension export” when appropriate; do not call SR from a smaller source native 6K acquisition. Disclose remaining blur, identity, prop, or motion defects.

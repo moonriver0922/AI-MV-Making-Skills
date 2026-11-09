@@ -1,38 +1,38 @@
-# 检查、失败预算与恢复
+# Review, failure budgets, and recovery
 
-## 找到错误发生的阶段
+## Locate the first failing stage
 
-对同一**原生帧**比较：ComfyUI原片→批准二采/SR→所选区间→完整导出。若文件来自selected或restored，先追父文件。不要用不同表情、不同时间或不同缩放的截图证明已修复。
+Compare the same native frame through original ComfyUI output, approved refinement/SR, selected interval, and actual export. Trace selected/restored files to parents. Different poses, timestamps, or scales cannot prove a repair.
 
-| 现象 | 首先核查 | 处理方向 |
+| Symptom | Inspect first | Appropriate direction |
 | --- | --- | --- |
-| 脸忽清忽糊 | 原生连续帧、脸在原画幅中的像素、裁切与编码链 | 原片已软则换批准清晰原片或受控原生近景；裁切致软则恢复构图 |
-| 换镜头换了人 | 人物版本、首尾帧、原生Take、二采是否改脸 | 同批准身份重新选片/生成，不能以“年龄变化”掩盖换人 |
-| 门颜色/大小/门轴变化 | 参考图布局、原生成帧、是否贴门或重投影 | 修参考与原生门动作；保持铰链、门框和把手关系 |
-| 小孩漂移 | 身体位移与两脚支撑/摆动相位，连续实际帧 | 调整控制/动作难度或正常剪辑；不靠循环脚步/演员慢放掩盖 |
-| 画纸线条动/图案变 | 输入图案、原生视频、后贴纸层与跟踪 | 稳定参考与道具动作；失败参考全排除，不继续传播 |
-| 年代读不出来 | 家具/材质/生活物件与人物分龄、年份提示 | 先让画面有变化，再按用户许可补简短年份 |
-| 镜头慢、不知所云 | 歌词/音乐cue、可见行动、情感目的 | 删除无因果片段，用真实短镜头重组；器乐段也有叙事任务 |
-| 浏览时糊/卡 | 本地编码文件、服务器响应、客户端播放状态 | 分开诊断，不把本地原片缺陷归咎于网络 |
+| Faces alternate between clear and soft | Native consecutive frames, facial pixel coverage, crops, encoding chain | Recover full framing; replace soft sources or generate controlled native close-ups |
+| Different person across cuts | Cast version, references, take, refinement drift | Reuse/generate the approved identity; aging does not excuse another actor |
+| Door color/size/hinge changes | References, native frames, pasted/reprojected plates | Fix references/native action; preserve frame, hinge, and handle relations |
+| Child glides | Body displacement versus stance/swing phases over continuous frames | Improve controls/action scope or use honest native editing; avoid loops or slow-motion camouflage |
+| Drawing changes or moves | Input art, native motion, pasted layers/tracking | Stabilize references and physical prop behavior; exclude failed references |
+| Eras are unclear | Furnishings, materials, domestic detail, aging, year cues | Make visual changes readable and add authorized concise dates |
+| Slow, confusing sequence | Musical cue, visible action, emotional purpose | Remove unmotivated coverage and restructure native shots |
+| Remote playback looks poor | Local file, server response, client behavior | Diagnose separately; local source defects are not explained by network assumptions |
 
-Prompt控制语义；参考帧控制身份和空间；姿态/视频控制动作；采样/模型参数影响生成方式。先看失败证据，再决定改哪一层。不要同时改变所有变量，然后用一次输出解释成因。
+Prompts constrain meaning, references constrain identity/space, motion controls constrain action, and sampling changes generation behavior. Choose the layer from observed failure. Changing every variable at once prevents a useful diagnosis.
 
-## 验收证据
+## Keep acceptance evidence specific
 
-每镜记录原速播放是否检查，首/中/尾与关键动作密集帧检查范围。看脚、门、画纸和手部，不能只看脸。检查前一镜的结束、当前动作、后一镜的开始。截掉动作前半或后半时记录剪辑省略，不声称完整动作已被看见。
+Record whether each shot was inspected in real-time playback, start/middle/end samples, and dense critical-action sequences. Inspect feet, doors, paper, and hands as well as faces. Include preceding and following cut boundaries. Editing away part of an action is an omission, not proof that a full landing or transfer was visibly completed.
 
-实际导出另检查字幕初始白/部分黄/全黄、英文阅读长度、年份位置、封面文字与片头偏移、音乐尾音、最后姿态。静帧检查、全解码、真人连续视听各有独立状态；技术工具返回0不会自动填“视觉通过”。
+Inspect actual encoded captions in white/partial-yellow/full-yellow states, English reading length, dates, cover spelling, intro offsets, music tail, and final pose. Sampled stills, full decode, continuous screening, and listening have separate statuses; exit code zero does not grant visual approval.
 
-## 两次失败后的动作
+## Stop after the agreed failure budget
 
-按项目problem_id累计次数，预算未另定时默认两次失败就停止并报告。改seed或换prompt不是新问题。记录：目标、变更变量、输出、失败点、耗时、是否采用。失败的参考图和视频移入拒用清单，不能被下一个镜头继续加载。
+Count attempts by stable problem_id across seeds, prompts, and workflow variants. Unless agreed otherwise, stop and report after two failed attempts. Record objective, changed variable, output, failure, time, and adoption. Keep rejected references out of subsequent jobs.
 
-达到预算后：保留底板，报告具体限制；复用真实合格素材或在授权范围重剪短镜头；继续其他任务。不要为一个失败动作反复消耗全片交付窗口，也不要把尚未修复的版本包装成全部完成。
+At the limit, preserve the baseline, disclose the defect, use suitable existing native coverage or authorized editing, and advance other tasks. Do not repeatedly consume the complete-film window or present retained failures as fully repaired.
 
-## 队列、截止时间与接续
+## Queue, deadline, and handoff
 
-保存project状态、选片manifest、每个作业的意图/receipt/history/output、最后完成步骤和下一步。接续先读这些记录并检查实际文件，不根据聊天中一句“继续”重发所有任务。另一个人的GPU任务、服务或磁盘不属于本任务清理对象。
+Save project state, selected manifest, intents/receipts/history/outputs, completed steps, and next actions. On resumption, read records and inspect actual files instead of resubmitting because a user said “continue.” Other users' GPU jobs, services, or files are not cleanup targets.
 
-进度包含已完成/总帧数和实测吞吐，估算还应包含导出、音频、解码、传输及终审。用户有明确截止时，保留一个完整可播放底板，每轮用独立版本；压缩任务范围优先于减少必要验证。支持的作业可写有限批次监督，但不能把它说成额度恢复后的自动续跑。调度、会话恢复与配额恢复是不同能力，只有实际配置并验证后才可声称存在。
+Progress should include completed/total frames and measured throughput. Estimates also need assembly, mux, decode, transfer, and review. Keep a complete playable fallback and independent versions. Reduce scope before dropping essential verification.
 
-共享环境的安装/更新另安排窗口，不为清晰度测试重启生产服务。取消只指向已知本任务ID；不要全局interrupt。请求状态不明时停提交并查证，而不是把网络超时算作没有生成。
+A finite batch supervisor is not quota-recovery automation. Scheduling, session resumption, and quota restoration are distinct capabilities; claim them only when configured and tested. Plan production environment changes separately. Cancel only known owned jobs, never global interrupt; resolve uncertain submission state before further POSTs.

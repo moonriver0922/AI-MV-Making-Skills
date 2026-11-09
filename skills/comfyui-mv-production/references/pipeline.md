@@ -1,29 +1,29 @@
-# 从歌曲到完整MV
+# From song to complete film
 
-## 输入与创作底板
+## Establish the production baseline
 
-固定歌曲文件及SHA、真实时长、采样率、歌词权威文本、演唱语言、目标观众、规格和截止时间。ASR用于定位，不用识别结果改写用户提供的歌词。标注不确定字与时间，未听校时明确记录。
+Record the exact audio master and hash, duration, sample rate, authoritative lyrics, language, audience, delivery specification, and dated deadline. Use ASR for timing, not to overwrite supplied lyrics. Mark uncertain words and machine-derived timing; distinguish listening checks actually performed.
 
-用一句话写清故事：谁想得到什么、阻碍是什么、结尾哪个可见动作说明关系发生了变化。每段副歌应推进关系，而非重复同一表演。先画出起因、误解、时间流转、回应，再按音乐决定镜头。
+Write a one-sentence story: who wants what, what prevents it, and which visible final action shows a changed relationship. Repeated choruses should advance that relationship. Map cause, misunderstanding, time passage, and response before assigning shots.
 
-角色表记录人物ID、年龄/年代、脸型、发型、服装、身材、全身和侧面参考。年代变化采用同一身份的分龄方案，不能把两个不同人解释为年龄差。每个场景记录门轴/把手、开门方向、窗格、家具位置、道具数量、墙地材质与光线。年代差异用可见生活细节和约定的年份提示表达。
+Maintain cast IDs with era/age, face, hair, wardrobe, body proportions, and full-body/profile references. Aging must follow one approved identity; it cannot excuse a different actor. Maintain set IDs with hinge/handle positions, opening direction, windows, furniture, prop counts, floor/wall materials, and lighting. Era differences need visible domestic details plus year cues when authorized.
 
-参考图需让人物、背景、道具和构图彼此相容。先检验“一张图里是否都成立”，再让视频模型解释运动。原始参考与批准版本均保存，失败的编辑不能被后续流程误当批准参考。
+Check that references are internally compatible before video generation. Preserve original and approved versions. A failed reference edit must not silently become another shot's approved input.
 
-## 按帧写镜头表
+## Plan on a frame clock
 
-每行至少包括：shot_id、take_id、timeline_in、frames、fps、歌词/音乐cue、可见动作、情感目的、人物/场景版本、参考帧、镜头景别、原片区间与验收点。用整数帧作为总时钟，约定区间为左闭右开。
+Each shot row should include shot_id, take_id, timeline_in, frames, fps, lyric/music cue, visible action, emotional purpose, cast/set version, references, camera scale, original source interval, and acceptance points. Use integer frames and half-open intervals.
 
-“女孩等待父亲看画”是目的；“女孩抬手敲门，父亲回应，门打开，两人相视”才是镜头行为。避免让单段视频同时承担走路、转身、开门、弯腰、交物等多个复杂动作。用户接受时，可用原生短镜头完成因果：敲门→反应→门把手→门开→双方回应。
+“The girl wants her father to notice the drawing” is an intention. Knocking, a reaction, the door opening, and a shared look are visible actions. Avoid asking one clip to solve walking, turning, opening, bending, and handing over a prop simultaneously. When the user accepts it, native short-shot coverage can express the same causal sequence.
 
-近景要在生成前设计与锁定，不在剪辑末端靠宽镜头局部放大补出。片段长度按实际动作和音乐决定；结尾留动作完成和情绪沉淀时间，不能截在手悬空或门未完成变化的位置。
+Design close-ups before generation. Leave time for the final action and emotional response to settle against the music. Do not end with a suspended hand or an unfinished door swing and call the exchange complete.
 
-器乐空段也要有叙事职责。例如快速人车流表示时间流逝，应检查真实播放速度、运动拖影与前后年代；缓慢街头散步不能仅靠prompt标签称为“时间穿梭”。加速采用明确源帧索引，不为主角动作随意慢放或循环。
+Instrumental passages also need a purpose. Fast urban traffic may express time passing; inspect its actual speed, motion blur, and connection to adjacent eras. A prompt labeled “hyperlapse” does not make slow walking read as time travel. Record source-frame indices for editorial speed changes; do not casually slow or loop principal performances.
 
-## 先难后易，先完整再精修
+## Prototype difficult actions, then finish the film
 
-用小样检验人物全身、落脚、开门和道具互动。先完成可理解的全片一采剪辑，再针对可定位的缺陷改进。保留批准底板和每轮完整预览，避免连续多次局部修改使全片失去可回退版本。
+Test full-body motion, planted feet, doors, and prop interactions early. Establish an understandable complete first-pass edit before polishing isolated details. Preserve approved baselines and complete versioned previews so local revisions remain reversible.
 
-研究别人工作流时优先查看作者仓库、正式文档、真实API节点和可下载workflow；记录版本及许可。视频演示中的节点名、显存和速度不等于本机可用能力。安装后用 `/object_info` 验证，不能凭记忆虚构节点。
+Research workflow authors' repositories, documentation, downloadable graphs, and version requirements. Demonstration node names and hardware performance do not prove local availability. Check `/object_info`; do not invent node classes from memory.
 
-截止任务先列关键路径：核源、剩余GPU帧数/实测耗时、组装、字幕、封装、完整解码、传输与检查。把资源等待列成不确定因素，不承诺有条件的任务必定准时完成。逐镜失败达到预算时，报告后推进下一个问题。
+For deadlines, estimate source work, remaining GPU frames using measured throughput, assembly, subtitles, muxing, full decode, transfer, and review. State resource uncertainty. When a problem reaches its retry budget, report it and advance another task instead of spending the complete-film window indefinitely.
