@@ -1,0 +1,48 @@
+{
+  "project_id": "my-mv",
+  "shot_id": "A01-T01",
+  "prompt": "One restrained continuous action with the approved fictional cast, fixed set geometry and physically supported motion. Preserve the approved reference composition.",
+  "models": {
+    "unet": "minimax_h3_fl2va_pruned_bf16.safetensors",
+    "clip": "qwen3vl_32b_minimax_h3_bf16.safetensors",
+    "video_vae": "minimax_h3_video_vae_fp16.safetensors"
+  },
+  "references": {
+    "first_frame": "shot001_start.png",
+    "last_frame": "shot001_end.png"
+  },
+  "render": {
+    "width": 1152,
+    "height": 480,
+    "frames": 73,
+    "fps": 24
+  },
+  "sampling": {
+    "seed": 42001,
+    "steps": 25
+  },
+  "refine": {
+    "width": 2304,
+    "height": 960,
+    "sigmas": "0.3,0.255,0.21,0.165,0.12,0.08,0.045,0.02,0.0"
+  },
+  "latents": {
+    "upscaled_video": "shot001_compatible_upscaled_video.latent",
+    "first_audio": "shot001_first_audio.latent"
+  },
+  "sr": {
+    "source_video": "shot001_approved_native.mp4",
+    "source_in": 0,
+    "frames": 73,
+    "model": "RealESRGAN_x2plus.pth",
+    "blend": 0.65
+  },
+  "delivery": {
+    "width": 6192,
+    "height": 2580,
+    "fps": 24,
+    "story_frames": 5112,
+    "cover_frames": 72
+  },
+  "retry_limit_per_problem": 2
+}

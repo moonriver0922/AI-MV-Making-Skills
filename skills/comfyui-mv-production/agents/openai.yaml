@@ -1,0 +1,4 @@
+interface:
+  display_name: "ComfyUI MV Production"
+  short_description: "Produce consistent ComfyUI music videos"
+  default_prompt: "Use $comfyui-mv-production to plan, generate, review, or repair my MV using approved full-frame ComfyUI outputs and deliver a complete film."

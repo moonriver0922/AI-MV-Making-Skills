@@ -1,0 +1,209 @@
+{
+  "prompt": {
+    "1": {
+      "class_type": "UNETLoader",
+      "inputs": {
+        "unet_name": "{{models.unet}}",
+        "weight_dtype": "default"
+      }
+    },
+    "2": {
+      "class_type": "CLIPLoader",
+      "inputs": {
+        "clip_name": "{{models.clip}}",
+        "type": "minimax",
+        "device": "default"
+      }
+    },
+    "3": {
+      "class_type": "VAELoader",
+      "inputs": {
+        "vae_name": "{{models.video_vae}}"
+      }
+    },
+    "4": {
+      "class_type": "MiniMaxH3SigmaShift",
+      "inputs": {
+        "model": [
+          "1",
+          0
+        ],
+        "shift_video": 12.0,
+        "shift_audio": 3.0
+      }
+    },
+    "5": {
+      "class_type": "KSamplerSelect",
+      "inputs": {
+        "sampler_name": "res_multistep"
+      }
+    },
+    "6": {
+      "class_type": "BasicScheduler",
+      "inputs": {
+        "model": [
+          "4",
+          0
+        ],
+        "scheduler": "simple",
+        "steps": "{{sampling.steps}}",
+        "denoise": 1.0
+      }
+    },
+    "100": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "{{references.first_frame}}"
+      }
+    },
+    "101": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "{{references.last_frame}}"
+      }
+    },
+    "102": {
+      "class_type": "MiniMaxH3ImageToVideo",
+      "inputs": {
+        "clip": [
+          "2",
+          0
+        ],
+        "vae": [
+          "3",
+          0
+        ],
+        "prompt": "{{prompt}}",
+        "width": "{{render.width}}",
+        "height": "{{render.height}}",
+        "length": "{{render.frames}}",
+        "first_frame": [
+          "100",
+          0
+        ],
+        "last_frame": [
+          "101",
+          0
+        ]
+      }
+    },
+    "103": {
+      "class_type": "BasicGuider",
+      "inputs": {
+        "model": [
+          "4",
+          0
+        ],
+        "conditioning": [
+          "102",
+          0
+        ]
+      }
+    },
+    "104": {
+      "class_type": "RandomNoise",
+      "inputs": {
+        "noise_seed": "{{sampling.seed}}"
+      }
+    },
+    "105": {
+      "class_type": "SamplerCustomAdvanced",
+      "inputs": {
+        "noise": [
+          "104",
+          0
+        ],
+        "guider": [
+          "103",
+          0
+        ],
+        "sampler": [
+          "5",
+          0
+        ],
+        "sigmas": [
+          "6",
+          0
+        ],
+        "latent_image": [
+          "102",
+          1
+        ]
+      }
+    },
+    "106": {
+      "class_type": "LTXVSeparateAVLatent",
+      "inputs": {
+        "av_latent": [
+          "105",
+          1
+        ]
+      }
+    },
+    "107": {
+      "class_type": "SaveLatent",
+      "inputs": {
+        "samples": [
+          "106",
+          0
+        ],
+        "filename_prefix": "mv/{{shot_id}}/latents/first_video"
+      }
+    },
+    "108": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "106",
+          0
+        ],
+        "vae": [
+          "3",
+          0
+        ]
+      }
+    },
+    "109": {
+      "class_type": "CreateVideo",
+      "inputs": {
+        "images": [
+          "108",
+          0
+        ],
+        "fps": "{{render.fps}}",
+        "bit_depth": "auto",
+        "color_space": "sRGB",
+        "codec": "none"
+      }
+    },
+    "110": {
+      "class_type": "SaveVideo",
+      "inputs": {
+        "video": [
+          "109",
+          0
+        ],
+        "filename_prefix": "mv/{{shot_id}}/native",
+        "format": "mp4",
+        "format.codec": "h264",
+        "format.codec.encoding": "auto"
+      }
+    },
+    "111": {
+      "class_type": "SaveLatent",
+      "inputs": {
+        "samples": [
+          "106",
+          1
+        ],
+        "filename_prefix": "mv/{{shot_id}}/latents/first_audio"
+      }
+    }
+  },
+  "extra_data": {
+    "template_only": true,
+    "parameterized_copy_GPU_validation": false,
+    "source_family": "MiniMax H3",
+    "requires_approved_sources": true
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "shots": [
+    {
+      "shot_id": "A01",
+      "approved_take": "T01",
+      "source_in": 0,
+      "frames": 73,
+      "candidates": [
+        {
+          "id": "A01-native",
+          "take_id": "T01",
+          "stage": "native",
+          "approved": true,
+          "full_frame": true,
+          "path": "media/A01-native.mp4",
+          "width": 1152,
+          "height": 480,
+          "frames": 73,
+          "prompt_id": "REPLACE_WITH_REAL_COMFY_ID"
+        },
+        {
+          "id": "A01-second",
+          "take_id": "T01",
+          "stage": "second_pass",
+          "parent_id": "A01-native",
+          "approved": true,
+          "full_frame": true,
+          "path": "media/A01-second.mp4",
+          "width": 2304,
+          "height": 960,
+          "frames": 73,
+          "prompt_id": "REPLACE_WITH_REAL_COMFY_ID"
+        },
+        {
+          "id": "A01-preview",
+          "take_id": "T01",
+          "stage": "editorial",
+          "parent_id": "A01-native",
+          "approved": true,
+          "full_frame": false,
+          "crop": [
+            500,
+            80,
+            576,
+            240
+          ],
+          "path": "preview/A01-6K-crop.mp4",
+          "width": 6192,
+          "height": 2580,
+          "frames": 73
+        }
+      ]
+    }
+  ]
+}
